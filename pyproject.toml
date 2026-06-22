@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "optimal-omt"
+name = "OMT"
 version = "0.1.0"
 description = "Optimal Model Trees using OR-Tools"
 readme = "README.md"
