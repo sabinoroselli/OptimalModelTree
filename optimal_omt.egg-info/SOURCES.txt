@@ -2,7 +2,7 @@ README.md
 pyproject.toml
 omt/DatabaseParser.py
 omt/Estimator.py
-omt/ORToolsClassifier.py
+omt/ModelTreeClassifier.py
 omt/TreeStructure.py
 omt/__init__.py
 optimal_omt.egg-info/PKG-INFO

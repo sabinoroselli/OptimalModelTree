@@ -11,7 +11,7 @@ warnings.filterwarnings(
     message="pkg_resources is deprecated*"
 )
 
-def optimal_OMT(df, features, labels, Splits, C, config):
+def optimal_OMT(df, features, labels, Splits, C, config,solver):
 
     gamma = 1 # this is the margin of the SVMs
 
@@ -76,7 +76,7 @@ def optimal_OMT(df, features, labels, Splits, C, config):
         i: Parent(root, i) for i in binary_tree.values
     }
 
-    m = pywraplp.Solver.CreateSolver("SCIP")
+    m = pywraplp.Solver.CreateSolver(solver)
 
     if m is None:
         raise RuntimeError("SCIP not available")

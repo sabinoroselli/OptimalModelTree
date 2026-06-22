@@ -3,6 +3,7 @@ pandas
 scikit-learn
 binarytree
 ortools
+setuptools<=80.9.0
 
 [dev]
 pytest

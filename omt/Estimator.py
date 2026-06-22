@@ -20,6 +20,7 @@ class OptimalModelTreeClassifier(BaseEstimator, ClassifierMixin):
         ww=False,
         sum_to_zero=False,
         console_log=True,
+        solver="SCIP"
     ):
         self.splits = splits
         self.C = C
@@ -32,6 +33,7 @@ class OptimalModelTreeClassifier(BaseEstimator, ClassifierMixin):
         self.ww = ww
         self.sum_to_zero = sum_to_zero
         self.console_log = console_log
+        self.solver = solver
 
     def fit(self, X, y):
 
@@ -67,6 +69,7 @@ class OptimalModelTreeClassifier(BaseEstimator, ClassifierMixin):
             Splits=self.splits,
             C=self.C,
             config=config,
+            solver=self.solver
         )
 
         self.classes_ = np.unique(y)

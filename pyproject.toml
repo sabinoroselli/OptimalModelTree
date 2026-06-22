@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "optimal-omt"
-version = "0.1.1"
+version = "0.1.3"
 description = "Optimal Model Trees using OR-Tools"
 readme = "README.md"
 requires-python = ">=3.9"

@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: optimal-omt
-Version: 0.1.0
+Version: 0.1.1
 Summary: Optimal Model Trees using OR-Tools
 Requires-Python: >=3.9
 Description-Content-Type: text/markdown
@@ -9,5 +9,6 @@ Requires-Dist: pandas
 Requires-Dist: scikit-learn
 Requires-Dist: binarytree
 Requires-Dist: ortools
+Requires-Dist: setuptools<=80.9.0
 Provides-Extra: dev
 Requires-Dist: pytest; extra == "dev"
