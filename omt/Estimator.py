@@ -1,7 +1,9 @@
 from sklearn.base import BaseEstimator, ClassifierMixin
-from .ORToolsClassifier import optimal_OMT
+from .ModelTreeClassifier import optimal_OMT
 import pandas as pd
 import numpy as np
+
+
 
 class OptimalModelTreeClassifier(BaseEstimator, ClassifierMixin):
 

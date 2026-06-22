@@ -1,8 +1,7 @@
 import arff as rf
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
-from TreeStructure import Multiplier
-from Binarizer import binarize_reduced, save_binarized_df
+from .TreeStructure import Multiplier
 
 def DataParser(name, ProbType, one_hot = True,toInt = False,StdScale=False):
 
@@ -79,50 +78,3 @@ def DataParser(name, ProbType, one_hot = True,toInt = False,StdScale=False):
         df.drop(columns=[id_name],inplace=True)
 
     return df
-
-if __name__ == "__main__":
-
-    #################### REGRESSION #####################
-    # collection = os.listdir('RegressionProblems')
-    #
-    # for i in collection:
-    #     df = regression_data_caller(i)
-    #     print(df)
-    #########################################
-
-    #################### CLASSIFICATION #####################
-    collection = [
-        ############ BINARY ############
-        'blogger.arff',
-        'boxing.arff',
-        'mux6.arff',
-        'corral.arff',
-        'biomed.arff',
-        'ionosphere.arff',
-        'jEdit.arff',
-        'schizo.arff',
-        'colic.arff',
-        'threeOf9.arff',
-        'R_data_frame.arff',
-        'australian.arff',
-        'doa_bwin_balanced.arff',
-        'blood-transf.arff',
-        'autoUniv.arff',
-        'parity.arff',
-        'banknote.arff',
-        'gametes_Epistasis.arff',
-        'kr-vs-kp.arff',
-        'banana.arff'
-    ]
-    for i in collection:
-        df = DataParser(i,
-                        'Classification',
-                        one_hot = False,
-                        toInt = False,
-                        StdScale=False)
-        print(i)
-        print(df)
-        df = binarize_reduced(df,max_thresholds=20)
-        print(df)
-        save_binarized_df(df,f'DL85_Problems/{i.split(".")[0]}.txt')
-    #########################################

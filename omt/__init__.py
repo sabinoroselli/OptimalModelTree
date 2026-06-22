@@ -1,3 +1,7 @@
 from.Estimator import OptimalModelTreeClassifier
+from .DatabaseParser import DataParser
 
-__all_= ["OptimalModelTreeClassifier"]
+__all_= [
+    "OptimalModelTreeClassifier",
+    "DataParser"
+]
