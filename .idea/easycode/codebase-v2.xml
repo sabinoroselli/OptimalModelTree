@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="com.obiscr.chatgpt.settings.EasyCodeState">
+    <option name="projectFiles" value="$PROJECT_DIR$/omt/__init__.py;/Users/sabinoroselli/PycharmProjects/OptimalModelTree/omt/DatabaseParser.py;/Users/sabinoroselli/PycharmProjects/OptimalModelTree/omt/Estimator.py;/Users/sabinoroselli/PycharmProjects/OptimalModelTree/omt/ModelTreeClassifier.py;/Users/sabinoroselli/PycharmProjects/OptimalModelTree/omt/TreeStructure.py;/Users/sabinoroselli/PycharmProjects/OptimalModelTree/tests/OMTClassifierTest.py;/Users/sabinoroselli/PycharmProjects/OptimalModelTree/README.md" />
+  </component>
+</project>
