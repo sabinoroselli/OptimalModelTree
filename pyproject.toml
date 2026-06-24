@@ -15,7 +15,7 @@ dependencies = [
     "scikit-learn",
     "binarytree",
     "ortools",
-    "setuptools<=80.9.0"
+    "setuptools"
 ]
 
 [project.optional-dependencies]

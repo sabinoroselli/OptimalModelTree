@@ -1,6 +1,5 @@
 import numpy as np
-import pandas as pd
-from binarytree import build
+from .BinaryTree import build_full_binary_tree, build_ancestors, collect_descendants
 
 
 class Node():
@@ -27,16 +26,18 @@ class OptimalTree():
         self.nodes = [i for i in range(2 ** (depth + 1) - 1)]
         self.classes = classes
 
-        self.complete_tree = build(self.nodes)
-        self.T_L = [i.value for i in self.complete_tree.leaves]  # leave nodes
-        self.T_B = [i for i in self.complete_tree.values if i not in self.T_L]
-        self.root = self.complete_tree.levels[0][0]
+        self.T_L = [i for i in self.nodes if 2 * i + 1 >= len(self.nodes)] # leave nodes
+        self.T_B = [i for i in self.nodes if 2 * i + 1 < len(self.nodes)]
+        self.root = 0
 
     def build_tree(self, current_node):
 
         if current_node in self.splitting_nodes:
-            left_subtree = self.build_tree( Children(self.root,current_node)[0].value)
-            right_subtree = self.build_tree(Children(self.root, current_node)[1].value)
+            left_child = 2 * current_node + 1
+            right_child = 2 * current_node + 2
+
+            left_subtree = self.build_tree(left_child)
+            right_subtree = self.build_tree(right_child)
             return Node(
                 current_node,
                 self.splitting_nodes[current_node]['a'],
@@ -50,7 +51,14 @@ class OptimalTree():
                 value = self.non_emtpy_nodes[current_node]
             )
         else:
-            descendants = [i for i in self.non_emtpy_nodes if current_node in Ancestors(self.root,i)]
+            descendants = []
+            for i in self.non_emtpy_nodes:
+                node = i
+                while node != self.root:
+                    node = (node - 1) // 2
+                    if node == current_node:
+                        descendants.append(i)
+                        break
             if len(descendants) > 0:
                 return Node(
                     current_node,

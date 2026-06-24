@@ -54,13 +54,12 @@ Note: OMT solves optimization problems exactly and is therefore intended primari
 🧪 Minimal Working Example
 
 The following example trains an Optimal Model Tree on the Wine dataset from scikit-learn.
+```
 
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from omt import OptimalModelTreeClassifier
-# Load dataset
 X, y = load_wine(return_X_y=True)
-# Split into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
@@ -68,15 +67,16 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42,
     stratify=y
 )
-# Create and train the model
-clf = OptimalModelTreeClassifier(Splits=2)
+clf = OptimalModelTreeClassifier(Splits=2,solver='SCIP')
 clf.fit(X_train, y_train)
-# Evaluate the model
 print("Test accuracy:", clf.score(X_test, y_test))
+```
 
 Example output:
+```
 
 Test accuracy: 0.944
+```
 
 ⸻
 
@@ -84,6 +84,7 @@ Test accuracy: 0.944
 
 If you use OMT in your research, please cite:
 
+```bibtex
 @article{roselli2025experiments,
   title={Experiments with Optimal Model Trees},
   author={Roselli, Sabino Francesco and Frank, Eibe},
@@ -91,4 +92,6 @@ If you use OMT in your research, please cite:
   year={2025}
   url = {https://github.com/sabinoroselli/OptimalModelTree}
 }
+```
+
 

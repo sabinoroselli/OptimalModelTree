@@ -1,15 +1,8 @@
 import numpy as np
 from time import process_time as tm
 from ortools.linear_solver import pywraplp
-from binarytree import build
+from .BinaryTree import build_full_binary_tree, build_ancestors, collect_descendants
 from .TreeStructure import OptimalTree,Parent
-
-import warnings
-
-warnings.filterwarnings(
-    "ignore",
-    message="pkg_resources is deprecated*"
-)
 
 def optimal_OMT(df, features, labels, Splits, C, config,solver):
 
@@ -38,48 +31,19 @@ def optimal_OMT(df, features, labels, Splits, C, config,solver):
 
     mu_min = min(mu.values())
 
-    # depth of the tree DOES NOT include root level
-    nodes = [i for i in range(2 ** (int(np.ceil(np.log2(Splits + 1))) + 1) - 1)]
-    binary_tree = build(nodes)
-    root = binary_tree.levels[0][0]
+    nodes, root, T_B, T_L, P, left, right = build_full_binary_tree(Splits)
 
-    # print(binary_tree)
+    A_l, A_r = build_ancestors(nodes, left, right, nodes)
 
-    T_L = [i.value for i in binary_tree.leaves]  # leave nodes
-    T_B = [i for i in binary_tree.values if i not in T_L] # branch nodes
+    D_l = {t: collect_descendants(left(t), left, right, len(nodes)) for t in T_B}
+    D_r = {t: collect_descendants(right(t), left, right, len(nodes)) for t in T_B}
 
-    A_l = {
-        i: [j.value for j in list(root) if j != i and j.left != None and i in j.left.values] for i in binary_tree.values
-    }
-
-    A_r = {
-        i: [j.value for j in list(root) if j != i and j.left != None and i in j.right.values] for i in
-        binary_tree.values
-    }
-
-    D_l = {
-            i : [k.value for k in j.left.leaves]
-            for i in T_B
-            for j in list(root)
-            if j.value == i
-            }
-
-    D_r = {
-        i: [k.value for k in j.right.leaves]
-        for i in T_B
-        for j in list(root)
-        if j.value == i
-    }
-
-
-    P = {
-        i: Parent(root, i) for i in binary_tree.values
-    }
+    P = {i: (i - 1) // 2 if i != 0 else None for i in nodes}
 
     m = pywraplp.Solver.CreateSolver(solver)
 
     if m is None:
-        raise RuntimeError("SCIP not available")
+        raise RuntimeError("Model not available")
 
     INF = m.infinity()
 
@@ -210,7 +174,7 @@ def optimal_OMT(df, features, labels, Splits, C, config,solver):
             sum(a[f, t] for f in features)
             == d[t]
         )
-    for t in [i for i in T_B if i != root.value]:
+    for t in [i for i in T_B if i != root]:
         m.Add(d[t] <= d[P[t]])
 
     # ==================================================
@@ -261,16 +225,13 @@ def optimal_OMT(df, features, labels, Splits, C, config,solver):
                 )
 
     # ==================================================
-
     # ACTIVE SPLIT => NONEMPTY DESCENDANTS
-
     # ==================================================
 
     for t in T_B:
         m.Add(
             d[t] <= sum( lvar[k] for k in D_l[t] )
         )
-
         m.Add(
             d[t] <= sum( lvar[k] for k in D_r[t] )
         )
@@ -285,164 +246,89 @@ def optimal_OMT(df, features, labels, Splits, C, config,solver):
             yi = float(df.loc[i, labels[0]])
             for t in T_L:
                 svm_expr = (
-
                         sum(
-
                             Beta[f, t]
-
                             * df.loc[i, f]
-
                             for f in features
-
                         )
-
                         + Delta[t]
-
                 )
-
                 m.Add(
-
                     gamma
-
                     - e[i, t]
-
                     <= svm_expr * yi
-
                     + M * (1 - z[i, t])
-
                 )
 
         # abs(Beta)
-
         for f in features:
-
             for t in T_L:
                 m.Add(
-
                     Bet_abs[f, t]
-
                     >= Beta[f, t]
-
                 )
-
                 m.Add(
-
                     Bet_abs[f, t]
-
                     >= -Beta[f, t]
-
                 )
-
     else:
-
         for c in classes:
-
             for i in I:
-
                 for t in T_L:
                     svm_expr = (
-
                             sum(
-
                                 Beta[c,f,t]
-
                                 * df.loc[i, f]
-
                                 for f in features
-
                             )
-
                             + Delta[c,t]
-
                     )
-
                     m.Add(
-
                         gamma
-
                         - e[c,i,t]
-
                         <= svm_expr
-
                         * LabelsPerClass[c][i]
-
                         + M * (1 - z[i, t])
-
                     )
-
         for c in classes:
-
             for f in features:
-
                 for t in T_L:
                     m.Add(
-
                         Bet_abs[c,f,t]
-
                         >= Beta[c,f,t]
-
                     )
-
                     m.Add(
-
                         Bet_abs[c,f,t]
-
                         >= -Beta[c,f,t]
-
                     )
 
     # ==================================================
     # SPLIT BUDGET
     # ==================================================
-
     m.Add( sum(d[t] for t in T_B) <= Splits )
 
     # ==================================================
     # OBJECTIVE
     # ==================================================
-
     if binary_case:
-
         objective = (
-
                 sum( Bet_abs[f, t] for f in features for t in T_L )
                 +
-                C * sum( e[i, t]
-
-            for i in I
-
-            for t in T_L
-
-        )
-
+                C * sum( e[i, t] for i in I for t in T_L )
         )
 
     else:
-
         objective = (
-
                 sum(
-
-                    Bet_abs[c,f,t]
-
-                    for c in classes
-
-                    for f in features
-
-                    for t in T_L
-
-                )
-
-                + C * sum( e[c,i,t] for c in classes for i in I for t in T_L )
-        )
+                    Bet_abs[c,f,t] for c in classes for f in features for t in T_L )
+                    + C * sum( e[c,i,t] for c in classes for i in I for t in T_L )
+                 )
 
     m.Minimize(objective)
 
     start = tm()
     status = m.Solve()
     runtime = tm() - start
-
-    splitting_nodes = {}
 
     if status != pywraplp.Solver.INFEASIBLE:
         vars = m.variables()
@@ -452,24 +338,14 @@ def optimal_OMT(df, features, labels, Splits, C, config,solver):
 
         non_zero_vars = [key for key,value in solution.items() if value > 0]
 
-        if config["SplitType"] == "Parallel":
-            splitting_nodes = {
-                i:{
-                    'a': [f for f in features if solution[f'a[{f},{i}]'] > 0][0],
-                    'b': round(solution[f'b[{i}]'],6)
-                }
-                for i in T_B if f'd[{i}]' in non_zero_vars
+        splitting_nodes = {
+            i:{
+                'a': [f for f in features if solution[f'a[{f},{i}]'] > 0][0],
+                'b': round(solution[f'b[{i}]'],6)
             }
-        elif config["SplitType"] == "Oblique":
-            splitting_nodes = {
-                i: {
-                    'a': {f: round(solution[f'a[{f},{i}]'], 6)
-                          for f in features
-                          },
-                    'b': round(solution[f'b[{i}]'], 6)
-                }
-                for i in T_B if f'd[{i}]' in non_zero_vars
-            }
+            for i in T_B if f'd[{i}]' in non_zero_vars
+        }
+
         if len(classes) == 2:
             non_empty_nodes = {
                 i: {
